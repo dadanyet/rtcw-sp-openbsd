@@ -293,7 +293,7 @@ char *strstr( const char *string, const char *strCharSet ) {
 }
 
 // NOTE TTimo: hey, given the number of !defined, I wonder what platform uses this
-#if !defined ( _MSC_VER ) && !defined ( __linux__ ) && !defined ( MAC_WOLF2_MP ) && !defined ( MAC_WOLF2_SP )
+#if !defined ( _MSC_VER ) && !defined ( __unix__ )
 
 int tolower( int c ) {
 	if ( Q_isupper( c ) ) {
@@ -771,7 +771,7 @@ double _atof( const char **stringPtr ) {
 }
 
 
-#if !defined( _MSC_VER ) && !defined( __linux__ )
+#if !defined( _MSC_VER ) && !defined( __unix__ )
 
 int atoi( const char *string ) {
 	int sign;

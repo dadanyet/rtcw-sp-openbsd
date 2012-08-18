@@ -2404,7 +2404,7 @@ void CL_ClientDamageCommand( void ) {
 void CL_startMultiplayer_f( void ) {
 #ifdef __MACOS__    //DAJ
 	Sys_StartProcess( "Wolfenstein MP", qtrue );
-#elif defined( __linux__ )
+#elif defined( __unix__ )
 	Sys_StartProcess( "./wolf.x86", qtrue );
 #else
 	Sys_StartProcess( "WolfMP.exe", qtrue );

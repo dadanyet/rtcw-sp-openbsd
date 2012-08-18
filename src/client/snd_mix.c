@@ -45,7 +45,7 @@ int     *snd_p;
 int snd_linear_count;
 short   *snd_out;
 
-#if !( defined __linux__ && defined __i386__ )
+#if !( defined __unix__ && defined __i386__ )
 #if !id386
 
 /*
@@ -126,7 +126,7 @@ LClampDone2:
 
 #endif // !id386
 
-#else // !(defined __linux__ && defined __i386__)
+#else // !(defined __unix__ && defined __i386__)
 
 // snd_mixa.s
 void S_WriteLinearBlastStereo16( void );

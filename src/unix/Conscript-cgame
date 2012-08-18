@@ -1,14 +1,24 @@
 # cgame
 
-Import qw( BASE_CFLAGS CONFIG_DIR BUILD_DIR BASEGAME CC CXX LINK );
+Import qw( BASE_CFLAGS CONFIG_DIR BUILD_DIR BASEGAME CC CXX LINK OS );
 
-$env = new cons(
-	CC => $CC,
-	CXX => $CXX,
-	LINK => $LINK,
-  CFLAGS => $BASE_CFLAGS . '-fPIC -DCGAMEDLL',
-  LDFLAGS => '-shared -ldl -lm'
-);
+if ($OS eq 'OpenBSD') {
+	$env = new cons(
+		CC => $CC,
+		CXX => $CXX,
+		LINK => $LINK,
+	  CFLAGS => $BASE_CFLAGS . '-fPIC -DCGAMEDLL',
+	  LDFLAGS => '-shared -lm'
+	);
+} else {
+	$env = new cons(
+		CC => $CC,
+		CXX => $CXX,
+		LINK => $LINK,
+	  CFLAGS => $BASE_CFLAGS . '-fPIC -DCGAMEDLL',
+	  LDFLAGS => '-shared -ldl -lm'
+	);
+}
 
 @FILES = qw(
   ../game/bg_animation.c

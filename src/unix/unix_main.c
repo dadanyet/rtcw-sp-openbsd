@@ -311,6 +311,16 @@ void Sys_Init( void ) {
 	Cvar_Set( "arch", "freebsd unknown" );
 #endif // FreeBSD
 
+#elif defined __OpenBSD__
+
+#if defined __i386__ // OpenBSD
+	Cvar_Set( "arch", "openbsd i386" );
+#elif defined __amd64__
+	Cvar_Set( "arch", "openbsd amd64" );
+#else
+	Cvar_Set( "arch", "openbsd unknown" );
+#endif // OpenBSD
+
 #else
 	Cvar_Set( "arch", "linux unknown" );
 #endif

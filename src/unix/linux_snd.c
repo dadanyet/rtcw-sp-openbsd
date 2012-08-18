@@ -40,6 +40,9 @@ If you have questions concerning this license or the applicable additional terms
 #ifdef __FreeBSD__ // rb0101023 - added
 #include <sys/soundcard.h>
 #endif
+#ifdef __OpenBSD__
+#include <soundcard.h>
+#endif
 #include <stdio.h>
 
 #include "../game/q_shared.h"

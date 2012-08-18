@@ -126,6 +126,8 @@ else
   $BASE_CFLAGS = $COMMON_CFLAGS . '-DNDEBUG -O6 -mcpu=pentiumpro -march=pentium -fomit-frame-pointer -ffast-math -malign-loops=2 -malign-jumps=2 -malign-functions=2 -fno-strict-aliasing -fstrength-reduce ';
 }
 
+$BASE_CFLAGS = $BASE_CFLAGS . ' -I/usr/X11R6/include ';
+
 # extract the wolf version from q_shared.h
 $line = `cat ../game/q_shared.h | grep Q3_VERSION`;
 chomp $line;
@@ -168,7 +170,7 @@ $BUILD_DIR = $CONFIG_DIR . "/" . $TARGET_DIR;
 
 Link $BUILD_DIR => '..';
 
-Export qw( BASE_CFLAGS CONFIG_DIR BUILD_DIR CC CXX LINK );
+Export qw( BASE_CFLAGS CONFIG_DIR BUILD_DIR CC CXX LINK OS );
 
 Build $BUILD_DIR . "/unix/Conscript-client";
 
@@ -179,7 +181,7 @@ $BUILD_DIR = $CONFIG_DIR . "/" . $TARGET_DIR;
 
 Link $BUILD_DIR => '..';
 
-Export qw( BASE_CFLAGS CONFIG_DIR BUILD_DIR BASEGAME CC CXX LINK );
+Export qw( BASE_CFLAGS CONFIG_DIR BUILD_DIR BASEGAME CC CXX LINK OS );
 
 Build $BUILD_DIR . "/unix/Conscript-game";
 
@@ -193,7 +195,7 @@ $BUILD_DIR = $CONFIG_DIR . "/" . $TARGET_DIR;
 
 Link $BUILD_DIR => '../..';
 
-Export qw( BASE_CFLAGS CONFIG_DIR BUILD_DIR BASEGAME CC CXX LINK );
+Export qw( BASE_CFLAGS CONFIG_DIR BUILD_DIR BASEGAME CC CXX LINK OS );
 
 Build $BUILD_DIR . "/src/unix/Conscript-cgame";
 
@@ -204,7 +206,7 @@ $BUILD_DIR = $CONFIG_DIR . "/" . $TARGET_DIR;
 
 Link $BUILD_DIR => '../..';
 
-Export qw( BASE_CFLAGS CONFIG_DIR BUILD_DIR BASEGAME CC CXX LINK );
+Export qw( BASE_CFLAGS CONFIG_DIR BUILD_DIR BASEGAME CC CXX LINK OS );
 
 Build $BUILD_DIR . "/src/unix/Conscript-ui";
 
