@@ -625,6 +625,13 @@ const char *CG_Argv( int arg ) {
 	return buffer;
 }
 
+const char *CG_Argv2( int arg ) {
+	static char buffer2[MAX_STRING_CHARS];
+
+	trap_Argv( arg, buffer2, sizeof( buffer2 ) );
+
+	return buffer2;
+}
 
 //========================================================================
 void CG_SetupDlightstyles( void ) {
