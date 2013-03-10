@@ -4,12 +4,11 @@
 #
 
 # the top directory is
-# <config>-<cpu>-<OS>-<libc version>
+# <config>-<cpu>-<OS>
 # where:
 #   <config> is "debug" or "release"
 #   <cpu> is "x86" or "ppc"
 #   <OS> is "Linux" "BSD" "IRIX" etc.
-#   <libc version> is major.minor of libc config
 
 # parse command line arguments and do the setup
 
@@ -20,24 +19,20 @@ $do_demo = 0;
 $do_info = 0;
 
 # compiler
-$CC='gcc -m32';
-$CXX='g++ -m32';
+$CC='gcc';
+$CXX='g++';
 $LINK=$CXX;
 
 # detection of CPU type
-$cpu = `uname -m`;
-chop ($cpu);
-if ($cpu +~ /i?86/)
+$CPU = `uname -m`;
+chop ($CPU);
+if ($CPU =~ m/i?86/)
 {
-  $cpu = 'x86';
+  $CPU = 'x86';
 }
 # OS
 $OS = `uname`;
 chop ($OS);
-# libc .. do the little magic!
-$libc_cmd = '/lib/libc.so.6 |grep "GNU C "|grep version|awk -F "version " \'{ print $2 }\'|cut -b -3';
-$libc = `$libc_cmd`;
-chop ($libc);
 
 if(@ARGV gt 0)
 {
@@ -79,7 +74,7 @@ if(@ARGV gt 0)
 }
 
 # build the config directory
-$CONFIG_DIR = $config . '-' . $cpu . '-' . $OS . '-' . $libc;
+$CONFIG_DIR = $config . '-' . $CPU . '-' . $OS;
 if ($do_demo eq 1)
 {
   $CONFIG_DIR = $CONFIG_DIR . '-demo';
@@ -123,7 +118,7 @@ if ($config eq 'debug')
 }
 else
 {
-  $BASE_CFLAGS = $COMMON_CFLAGS . '-DNDEBUG -O6 -mcpu=pentiumpro -march=pentium -fomit-frame-pointer -ffast-math -malign-loops=2 -malign-jumps=2 -malign-functions=2 -fno-strict-aliasing -fstrength-reduce ';
+  $BASE_CFLAGS = $COMMON_CFLAGS . '-DNDEBUG -O2 -fomit-frame-pointer -ffast-math -falign-loops=2 -falign-jumps=2 -falign-functions=2 -fno-strict-aliasing -fstrength-reduce ';
 }
 
 $BASE_CFLAGS = $BASE_CFLAGS . ' -I/usr/X11R6/include ';
@@ -135,7 +130,7 @@ $line =~ s/.*Wolf\ (.*)\"/$1/;
 $WOLF_VER = $line;
 
 print "Wolfenstein version $WOLF_VER\n";
-print 'cpu : ' . $cpu . "\nOS  : " . $OS . "\nlibc: " . $libc . "\n";
+print 'cpu : ' . $CPU . "\nOS  : " . $OS . "\n";
 print "configured for " . $config . " build\n";
 if ($do_demo eq 1)
 {
@@ -170,7 +165,7 @@ $BUILD_DIR = $CONFIG_DIR . "/" . $TARGET_DIR;
 
 Link $BUILD_DIR => '..';
 
-Export qw( BASE_CFLAGS CONFIG_DIR BUILD_DIR CC CXX LINK OS );
+Export qw( BASE_CFLAGS CONFIG_DIR BUILD_DIR CC CXX LINK OS CPU );
 
 Build $BUILD_DIR . "/unix/Conscript-client";
 
@@ -181,7 +176,7 @@ $BUILD_DIR = $CONFIG_DIR . "/" . $TARGET_DIR;
 
 Link $BUILD_DIR => '..';
 
-Export qw( BASE_CFLAGS CONFIG_DIR BUILD_DIR BASEGAME CC CXX LINK OS );
+Export qw( BASE_CFLAGS CONFIG_DIR BUILD_DIR BASEGAME CC CXX LINK OS CPU );
 
 Build $BUILD_DIR . "/unix/Conscript-game";
 
@@ -195,7 +190,7 @@ $BUILD_DIR = $CONFIG_DIR . "/" . $TARGET_DIR;
 
 Link $BUILD_DIR => '../..';
 
-Export qw( BASE_CFLAGS CONFIG_DIR BUILD_DIR BASEGAME CC CXX LINK OS );
+Export qw( BASE_CFLAGS CONFIG_DIR BUILD_DIR BASEGAME CC CXX LINK OS CPU );
 
 Build $BUILD_DIR . "/src/unix/Conscript-cgame";
 
@@ -206,7 +201,7 @@ $BUILD_DIR = $CONFIG_DIR . "/" . $TARGET_DIR;
 
 Link $BUILD_DIR => '../..';
 
-Export qw( BASE_CFLAGS CONFIG_DIR BUILD_DIR BASEGAME CC CXX LINK OS );
+Export qw( BASE_CFLAGS CONFIG_DIR BUILD_DIR BASEGAME CC CXX LINK OS CPU );
 
 Build $BUILD_DIR . "/src/unix/Conscript-ui";
 

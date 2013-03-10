@@ -368,8 +368,6 @@ If you have questions concerning this license or the applicable additional terms
 {"LongSwap", (byte *)LongSwap},
 {"ShortNoSwap", (byte *)ShortNoSwap},
 {"ShortSwap", (byte *)ShortSwap},
-{"LittleFloat", (byte *)LittleFloat},
-{"BigFloat", (byte *)BigFloat},
 {"LittleLong64", (byte *)LittleLong64},
 {"BigLong64", (byte *)BigLong64},
 {"LittleLong", (byte *)LittleLong},

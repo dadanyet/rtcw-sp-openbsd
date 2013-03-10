@@ -368,8 +368,6 @@ extern int LongNoSwap ( int l ) ;
 extern int LongSwap ( int l ) ;
 extern short ShortNoSwap ( short l ) ;
 extern short ShortSwap ( short l ) ;
-extern float LittleFloat ( float l ) ;
-extern float BigFloat ( float l ) ;
 extern qint64 LittleLong64 ( qint64 l ) ;
 extern qint64 BigLong64 ( qint64 l ) ;
 extern int LittleLong ( int l ) ;

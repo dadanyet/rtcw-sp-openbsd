@@ -1,6 +1,6 @@
 # cgame
 
-Import qw( BASE_CFLAGS CONFIG_DIR BUILD_DIR BASEGAME CC CXX LINK OS );
+Import qw( BASE_CFLAGS CONFIG_DIR BUILD_DIR BASEGAME CC CXX LINK OS CPU );
 
 if ($OS eq 'OpenBSD') {
 	$env = new cons(
@@ -55,6 +55,5 @@ if ($OS eq 'OpenBSD') {
   );
 $FILESREF = \@FILES;
 
-# FIXME CPU string  
-Program $env 'cgamei386.so', @$FILESREF;
-Install $env '#' . $CONFIG_DIR . '/out/' . $BASEGAME, 'cgamei386.so';
+Program $env 'cgame' . $CPU . '.so', @$FILESREF;
+Install $env '#' . $CONFIG_DIR . '/out/' . $BASEGAME, 'cgame' . $CPU . '.so';
