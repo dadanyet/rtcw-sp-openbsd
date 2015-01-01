@@ -708,15 +708,16 @@ static void signal_handler( int sig ) { // bk010104 - replace this... (NOTE TTim
 }
 
 static void InitSig( void ) {
+#if 0
 	signal( SIGHUP, signal_handler );
 	signal( SIGQUIT, signal_handler );
 	signal( SIGILL, signal_handler );
 	signal( SIGTRAP, signal_handler );
-	signal( SIGIOT, signal_handler );
 	signal( SIGBUS, signal_handler );
 	signal( SIGFPE, signal_handler );
 	signal( SIGSEGV, signal_handler );
 	signal( SIGTERM, signal_handler );
+#endif
 }
 
 /*
