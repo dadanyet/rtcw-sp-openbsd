@@ -1139,7 +1139,23 @@ static void GLW_InitExtensions( void ) {
 	ri.Printf( PRINT_ALL, "Initializing OpenGL extensions\n" );
 
 	// GL_S3_s3tc
+	// RF, check for GL_EXT_texture_compression_s3tc
+	if ( strstr( glConfig.extensions_string, "GL_EXT_texture_compression_s3tc" ) ) {
+		if ( r_ext_compressed_textures->integer ) {
+			glConfig.textureCompression = TC_EXT_COMP_S3TC;
+			ri.Printf( PRINT_ALL, "...using GL_EXT_texture_compression_s3tc\n" );
+		} else
+		{
+			glConfig.textureCompression = TC_NONE;
+			ri.Printf( PRINT_ALL, "...ignoring GL_EXT_texture_compression_s3tc\n" );
+		}
+	} else
+	{
+		ri.Printf( PRINT_ALL, "...GL_EXT_texture_compression_s3tc not found\n" );
+	}
+	/* RF, disabled this section, since this method produces very ugly results on nvidia hardware
 	if ( Q_stristr( glConfig.extensions_string, "GL_S3_s3tc" ) ) {
+
 		if ( r_ext_compressed_textures->value ) {
 			glConfig.textureCompression = TC_S3TC;
 			ri.Printf( PRINT_ALL, "...using GL_S3_s3tc\n" );
@@ -1153,6 +1169,7 @@ static void GLW_InitExtensions( void ) {
 		glConfig.textureCompression = TC_NONE;
 		ri.Printf( PRINT_ALL, "...GL_S3_s3tc not found\n" );
 	}
+	*/
 
 	// GL_EXT_texture_env_add
 	glConfig.textureEnvAddAvailable = qfalse;
@@ -1218,6 +1235,18 @@ static void GLW_InitExtensions( void ) {
 	} else
 	{
 		ri.Printf( PRINT_ALL, "...GL_EXT_compiled_vertex_array not found\n" );
+	}
+
+	// GL_EXT_texture_filter_anisotropic
+	if ( strstr( glConfig.extensions_string, "GL_EXT_texture_filter_anisotropic" ) &&
+	     r_ext_texture_filter_anisotropic->integer ) {
+		glConfig.anisotropicAvailable = qtrue;
+		qglGetFloatv( GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, &glConfig.maxAnisotropy );
+		ri.Printf( PRINT_ALL, "...using GL_EXT_texture_filter_anisotropic\n" );
+	} else {
+		ri.Printf( PRINT_ALL, "...GL_EXT_texture_filter_anisotropic not found\n" );
+		glConfig.anisotropicAvailable = qfalse;
+		ri.Cvar_Set( "r_ext_texture_filter_anisotropic", "0" );
 	}
 
 	// GL_NV_fog_distance
