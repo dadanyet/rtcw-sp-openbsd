@@ -646,47 +646,28 @@ void Parse3DMatrix( char **buf_p, int z, int y, int x, float *m ) {
 */
 
 int Q_isprint( int c ) {
-	if ( c >= 0x20 && c <= 0x7E ) {
-		return ( 1 );
-	}
-	return ( 0 );
+	return (isprint(c)? 1 : 0);
 }
 
 int Q_islower( int c ) {
-	if ( c >= 'a' && c <= 'z' ) {
-		return ( 1 );
-	}
-	return ( 0 );
+	return (islower(c)? 1 : 0);
 }
 
 int Q_isupper( int c ) {
-	if ( c >= 'A' && c <= 'Z' ) {
-		return ( 1 );
-	}
-	return ( 0 );
+	return (isupper(c)? 1 : 0);
 }
 
 int Q_isalpha( int c ) {
-	if ( ( c >= 'a' && c <= 'z' ) || ( c >= 'A' && c <= 'Z' ) ) {
-		return ( 1 );
-	}
-	return ( 0 );
+	return (isalpha(c)? 1 : 0);
 }
 
 //----(SA)	added
 int Q_isnumeric( int c ) {
-	if ( c >= '0' && c <= '9' ) {
-		return ( 1 );
-	}
-	return ( 0 );
+	return (isdigit(c)? 1 : 0);
 }
 
 int Q_isalphanumeric( int c ) {
-	if ( Q_isalpha( c ) ||
-		 Q_isnumeric( c ) ) {
-		return( 1 );
-	}
-	return ( 0 );
+	return (isalnum(c)? 1 : 0);
 }
 
 int Q_isforfilename( int c ) {
@@ -699,24 +680,7 @@ int Q_isforfilename( int c ) {
 
 
 char* Q_strrchr( const char* string, int c ) {
-	char cc = c;
-	char *s;
-	char *sp = (char *)0;
-
-	s = (char*)string;
-
-	while ( *s )
-	{
-		if ( *s == cc ) {
-			sp = s;
-		}
-		s++;
-	}
-	if ( cc == 0 ) {
-		sp = s;
-	}
-
-	return sp;
+	return (strrchr(string, c));
 }
 
 /*
@@ -734,58 +698,36 @@ void Q_strncpyz( char *dest, const char *src, int destsize ) {
 		Com_Error( ERR_FATAL,"Q_strncpyz: destsize < 1" );
 	}
 
-	strncpy( dest, src, destsize - 1 );
-	dest[destsize - 1] = 0;
+	strlcpy( dest, src, destsize );
 }
 
 int Q_stricmpn( const char *s1, const char *s2, int n ) {
-	int c1, c2;
+	int s, ret;
 
-	do {
-		c1 = *s1++;
-		c2 = *s2++;
+	s = strncasecmp(s1, s2, n);
+	ret = s? (s < 1)? -1 : 1 : 0;
 
-		if ( !n-- ) {
-			return 0;       // strings are equal until end point
-		}
-
-		if ( c1 != c2 ) {
-			if ( Q_islower( c1 ) ) {
-				c1 -= ( 'a' - 'A' );
-			}
-			if ( Q_islower( c2 ) ) {
-				c2 -= ( 'a' - 'A' );
-			}
-			if ( c1 != c2 ) {
-				return c1 < c2 ? -1 : 1;
-			}
-		}
-	} while ( c1 );
-
-	return 0;       // strings are equal
+	return ret;
 }
 
 int Q_strncmp( const char *s1, const char *s2, int n ) {
-	int c1, c2;
+	int s, ret;
 
-	do {
-		c1 = *s1++;
-		c2 = *s2++;
+	s = strncmp(s1, s2, n);
+	ret = s? (s < 1)? -1 : 1 : 0;
 
-		if ( !n-- ) {
-			return 0;       // strings are equal until end point
-		}
-
-		if ( c1 != c2 ) {
-			return c1 < c2 ? -1 : 1;
-		}
-	} while ( c1 );
-
-	return 0;       // strings are equal
+	return ret;
 }
 
 int Q_stricmp( const char *s1, const char *s2 ) {
-	return ( s1 && s2 ) ? Q_stricmpn( s1, s2, 99999 ) : -1;
+	int s, ret;
+	if (!s1 || !s2) /* XXX foo */
+		ret = -1;
+	else {
+		s = strcasecmp(s1, s2);
+		ret = s? (s < 1)? -1 : 1 : 0;
+	}
+	return ret;
 }
 
 
@@ -869,53 +811,24 @@ char *Q_CleanStr( char *string ) {
 
 
 void QDECL Com_sprintf( char *dest, int size, const char *fmt, ... ) {
-	int len;
-	va_list argptr;
-	char bigbuffer[32000];      // big, but small enough to fit in PPC stack
+	int	len;
+	va_list	argptr;
 
 	va_start( argptr,fmt );
-	len = vsprintf( bigbuffer,fmt,argptr );
+	len = vsnprintf( dest,size,fmt,argptr );
 	va_end( argptr );
-	if ( len >= sizeof( bigbuffer ) ) {
-		Com_Error( ERR_FATAL, "Com_sprintf: overflowed bigbuffer" );
-	}
-	if ( len >= size ) {
-		Com_Printf( "Com_sprintf: overflow of %i in %i\n", len, size );
-	}
-	Q_strncpyz( dest, bigbuffer, size );
+
+	if (len < 0)
+		Com_Error( ERR_FATAL, "Com_sprintf" );
 }
 
 // Ridah, ripped from l_bsp.c
 int Q_strncasecmp( char *s1, char *s2, int n ) {
-	int c1, c2;
-
-	do
-	{
-		c1 = *s1++;
-		c2 = *s2++;
-
-		if ( !n-- ) {
-			return 0;       // strings are equal until end point
-
-		}
-		if ( c1 != c2 ) {
-			if ( Q_islower( c1 ) ) {
-				c1 -= ( 'a' - 'A' );
-			}
-			if ( Q_islower( c2 ) ) {
-				c2 -= ( 'a' - 'A' );
-			}
-			if ( c1 != c2 ) {
-				return -1;      // strings not equal
-			}
-		}
-	} while ( c1 );
-
-	return 0;       // strings are equal
+	return (strncasecmp(s1, s2, n)? -1 : 0);
 }
 
 int Q_strcasecmp( char *s1, char *s2 ) {
-	return Q_strncasecmp( s1, s2, 99999 );
+	return (strcasecmp( s1, s2 )? -1 : 0);
 }
 // done.
 
