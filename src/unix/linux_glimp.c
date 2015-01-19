@@ -1107,7 +1107,8 @@ int GLW_SetMode( const char *drivername, int mode, qboolean fullscreen ) {
 
 	// bk010122 - new software token (Indirect)
 	if ( !Q_stricmp( glstring, "Mesa X11" )
-		 || !Q_stricmp( glstring, "Mesa GLX Indirect" ) ) {
+		 || !Q_stricmp( glstring, "Mesa GLX Indirect" )
+	  	 || !Q_stricmp( glstring, "Software Rasterizer" )) {
 		if ( !r_allowSoftwareGL->integer ) {
 			ri.Printf( PRINT_ALL, "\n\n***********************************************************\n" );
 			ri.Printf( PRINT_ALL, " You are using software Mesa (no hardware acceleration)!   \n" );
