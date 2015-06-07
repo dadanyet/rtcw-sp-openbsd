@@ -944,8 +944,8 @@ typedef struct {
 	int bits;           // 0 = float
 } netField_t;
 
-// using the stringizing operator to save typing...
-#define NETF( x ) # x,(size_t)&( (entityState_t*)0 )->x
+#include <stddef.h>
+#define NETF( x ) # x, offsetof(entityState_t, x)
 
 netField_t entityStateFields[] =
 {
@@ -1375,8 +1375,7 @@ plyer_state_t communication
 ============================================================================
 */
 
-// using the stringizing operator to save typing...
-#define PSF( x ) # x,(size_t)&( (playerState_t*)0 )->x
+#define PSF( x ) # x, offsetof(playerState_t, x)
 
 netField_t playerStateFields[] =
 {

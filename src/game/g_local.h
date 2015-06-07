@@ -172,8 +172,8 @@ typedef struct
 void G_Script_ScriptEvent( gentity_t *ent, char *eventStr, char *params );
 //====================================================================
 
-
-#define CFOFS( x ) ( (size_t)&( ( (gclient_t *)0 )->x ) )
+#include <stddef.h>
+#define CFOFS( x ) offsetof(gclient_t, x)
 
 struct gentity_s {
 	entityState_t s;                // communicated by server to clients
@@ -1079,7 +1079,7 @@ extern level_locals_t level;
 extern gentity_t g_entities[MAX_GENTITIES];
 extern gentity_t       *g_camEnt;
 
-#define FOFS( x ) ( (size_t)&( ( (gentity_t *)0 )->x ) )
+#define FOFS( x ) offsetof(gentity_t, x)
 
 extern vmCvar_t g_gametype;
 
