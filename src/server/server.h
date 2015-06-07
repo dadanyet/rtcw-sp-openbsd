@@ -172,6 +172,7 @@ typedef struct client_s {
 	int snapshotMsec;                   // requests a snapshot every snapshotMsec unless rate choked
 	int pureAuthentic;
 	netchan_t netchan;
+	qboolean csUpdated[MAX_CONFIGSTRINGS];
 } client_t;
 
 //=============================================================================

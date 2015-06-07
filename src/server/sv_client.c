@@ -616,6 +616,10 @@ void SV_ClientEnterWorld( client_t *client, usercmd_t *cmd ) {
 	Com_DPrintf( "Going from CS_PRIMED to CS_ACTIVE for %s\n", client->name );
 	client->state = CS_ACTIVE;
 
+	// resend all configstrings using the cs commands since these are
+	// no longer sent when the client is CS_PRIMED
+	SV_UpdateConfigstrings( client );
+
 	// set up the entity for the client
 	clientNum = client - svs.clients;
 	ent = SV_GentityNum( clientNum );
@@ -624,7 +628,11 @@ void SV_ClientEnterWorld( client_t *client, usercmd_t *cmd ) {
 
 	client->deltaMessage = -1;
 	client->nextSnapshotTime = svs.time;    // generate a snapshot immediately
-	client->lastUsercmd = *cmd;
+
+	if (cmd)
+		memcpy(&client->lastUsercmd, cmd, sizeof(client->lastUsercmd));
+	else
+		memset(&client->lastUsercmd, '\0', 1);
 
 	// call the game begin function
 	VM_Call( gvm, GAME_CLIENT_BEGIN, client - svs.clients );
@@ -1199,7 +1207,8 @@ void SV_ExecuteClientCommand( client_t *cl, const char *s, qboolean clientOK ) {
 
 	if ( clientOK ) {
 		// pass unknown strings to the game
-		if ( !u->name && sv.state == SS_GAME ) {
+		if ( !u->name && sv.state == SS_GAME && ( cl->state == CS_ACTIVE || cl->state == CS_PRIMED ) ) {
+
 			VM_Call( gvm, GAME_CLIENT_COMMAND, cl - svs.clients );
 		}
 	}
@@ -1431,10 +1440,16 @@ void SV_ExecuteClientMessage( client_t *cl, msg_t *msg ) {
 	// gamestate it was at.  This allows it to keep downloading even when
 	// the gamestate changes.  After the download is finished, we'll
 	// notice and send it a new game state
+	//
+	// https://zerowing.idsoftware.com/bugzilla/show_bug.cgi?id=536
+	// don't drop as long as previous command was a nextdl, after a dl is done, downloadName is set back to ""
+	// but we still need to read the next message to move to next download or send gamestate
+	// I don't like this hack though, it must have been working fine at some point, suspecting the fix is somewhere else
 	if ( serverId != sv.serverId &&
-		 !*cl->downloadName ) {
-		if ( serverId == sv.restartedServerId ) {
+		 !*cl->downloadName &&!strstr(cl->lastClientCommandString, "nextdl") ) {
+		if ( serverId >= sv.restartedServerId && serverId < sv.serverId ) { // TTimo - use a comparison here to catch multiple map_restart
 			// they just haven't caught the map_restart yet
+			Com_DPrintf("%s : ignoring pre map_restart / outdated client message\n", cl->name);
 			return;
 		}
 		// if we can tell that the client has dropped the last

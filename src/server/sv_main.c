@@ -144,11 +144,9 @@ not have future snapshot_t executed before it is executed
 void SV_AddServerCommand( client_t *client, const char *cmd ) {
 	int index, i;
 
-
-
-
-
-
+	// do not send commands until the gamestate has been sent
+	if( client->state < CS_PRIMED )
+		return;
 
 	client->reliableSequence++;
 	// if we would be losing an old command that hasn't been acknowledged,
