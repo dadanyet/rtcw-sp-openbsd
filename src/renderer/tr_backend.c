@@ -1188,6 +1188,7 @@ void RE_StretchRaw( int x, int y, int w, int h, int cols, int rows, const byte *
 	RB_SetGL2D();
 
 	qglColor3f( tr.identityLight, tr.identityLight, tr.identityLight );
+//	qglDisable (GL_TEXTURE_2D);
 
 	qglBegin( GL_QUADS );
 	qglTexCoord2f( 0.5f / cols,  0.5f / rows );
@@ -1199,6 +1200,8 @@ void RE_StretchRaw( int x, int y, int w, int h, int cols, int rows, const byte *
 	qglTexCoord2f( 0.5f / cols, ( rows - 0.5f ) / rows );
 	qglVertex2f( x, y + h );
 	qglEnd();
+
+//	qglEnable (GL_TEXTURE_2D);
 }
 
 

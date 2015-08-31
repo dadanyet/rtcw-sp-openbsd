@@ -187,6 +187,15 @@ void GL_TextureMode( const char *string ) {
 	gl_filter_min = modes[i].minimize;
 	gl_filter_max = modes[i].maximize;
 
+	// Knightmare- clamp selected anisotropy
+	if (glConfig.anisotropicAvailable)
+	{
+		if (r_ext_texture_filter_anisotropic->value > glConfig.maxAnisotropy)
+			ri.Cvar_Set("r_ext_texture_filter_anisotropic", va("%4.1f", glConfig.maxAnisotropy));
+		else if (r_ext_texture_filter_anisotropic->value < 1.0)
+			ri.Cvar_Set("r_ext_texture_filter_anisotropic", "1.0");
+	}
+
 	// change all the existing mipmap texture objects
 	for ( i = 0 ; i < tr.numImages ; i++ ) {
 		glt = tr.images[ i ];
@@ -194,6 +203,43 @@ void GL_TextureMode( const char *string ) {
 			GL_Bind( glt );
 			qglTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, gl_filter_min );
 			qglTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, gl_filter_max );
+
+			// Knightmare- set anisotropic filter if supported and enabled
+			if (glConfig.anisotropicAvailable && r_ext_texture_filter_anisotropic->value)
+				qglTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, r_ext_texture_filter_anisotropic->integer);
+		}
+	}
+}
+
+/*
+===============
+GL_UpdateAnisoMode
+
+Knightmare added- this updates anisotropic filter mode
+===============
+*/
+void GL_UpdateAnisoMode( void ) {
+	int i;
+	image_t *glt;
+
+	if (!glConfig.anisotropicAvailable)
+		return;
+
+	// clamp selected anisotropy
+	if (r_ext_texture_filter_anisotropic->value > glConfig.maxAnisotropy)
+		ri.Cvar_Set("r_ext_texture_filter_anisotropic", va("%4.1f", glConfig.maxAnisotropy));
+	else if (r_ext_texture_filter_anisotropic->value < 1.0)
+		ri.Cvar_Set("r_ext_texture_filter_anisotropic", "1.0");
+
+	// change all the existing mipmap texture objects
+	for ( i = 0 ; i < tr.numImages ; i++ ) {
+		glt = tr.images[ i ];
+		if ( glt->mipmap ) {
+			GL_Bind( glt );
+
+		// set anisotropic filter if supported and enabled
+		if (r_ext_texture_filter_anisotropic->value)
+			qglTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, r_ext_texture_filter_anisotropic->integer);
 		}
 	}
 }
@@ -849,8 +895,12 @@ done:
 	if ( mipmap ) {
 		qglTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, gl_filter_min );
 		qglTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, gl_filter_max );
-	} else
-	{
+
+		// Knightmare- set anisotropic filter if supported and enabled
+		if (glConfig.anisotropicAvailable && r_ext_texture_filter_anisotropic->value)
+			qglTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, r_ext_texture_filter_anisotropic->integer);
+	}
+	else {
 		qglTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
 		qglTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
 	}

@@ -32,7 +32,7 @@ If you have questions concerning this license or the applicable additional terms
 #include "qcommon.h"
 #include <setjmp.h>
 
-#define MAXPRINTMSG 4096
+#define MAXPRINTMSG 8192	// Knightmare- increased from 4096
 
 #define MAX_NUM_ARGVS   50
 

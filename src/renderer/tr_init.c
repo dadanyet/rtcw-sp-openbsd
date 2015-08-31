@@ -102,6 +102,7 @@ cvar_t  *r_ext_texture_env_add;
 
 //----(SA)	added
 cvar_t  *r_ext_texture_filter_anisotropic;
+cvar_t  *r_ext_texture_filter_anisotropic_avail;	// Knightmare added
 
 cvar_t  *r_ext_NV_fog_dist;
 cvar_t  *r_nv_fogdist_mode;
@@ -380,19 +381,40 @@ typedef struct vidmode_s
 
 vidmode_t r_vidModes[] =
 {
-	{ "Mode  0: 320x240",        320,    240,    1 },
-	{ "Mode  1: 400x300",        400,    300,    1 },
-	{ "Mode  2: 512x384",        512,    384,    1 },
-	{ "Mode  3: 640x480",        640,    480,    1 },
-	{ "Mode  4: 800x600",        800,    600,    1 },
-	{ "Mode  5: 960x720",        960,    720,    1 },
-	{ "Mode  6: 1024x768",       1024,   768,    1 },
-	{ "Mode  7: 1152x864",       1152,   864,    1 },
-	{ "Mode  8: 1280x1024",      1280,   1024,   1 },
-	{ "Mode  9: 1600x1200",      1600,   1200,   1 },
-	{ "Mode 10: 2048x1536",      2048,   1536,   1 },
-	{ "Mode 11: 856x480 (wide)",856, 480,    1 },
-	{ "Mode 12: 1920x1200 (wide)",1920,  1200,   1 }     //----(SA)	added
+	{ "Mode  0: 320x240",         320,    240,    1 },
+	{ "Mode  1: 400x300",         400,    300,    1 },
+	{ "Mode  2: 512x384",         512,    384,    1 },
+	{ "Mode  3: 640x480",         640,    480,    1 },
+	{ "Mode  4: 800x600",         800,    600,    1 },
+	{ "Mode  5: 960x720",         960,    720,    1 },
+	{ "Mode  6: 1024x768",        1024,   768,    1 },
+	{ "Mode  7: 1152x864",        1152,   864,    1 },
+	{ "Mode  8: 1280x960",        1280,   960,    1 },    // Knightmare	added
+	{ "Mode  9: 1280x1024",       1280,   1024,   1 },
+	{ "Mode 10: 1400x1050",       1400,   1050,   1 },    // Knightmare	added
+	{ "Mode 11: 1600x1200",       1600,   1200,   1 },
+	{ "Mode 12: 1920x1440",	      1920,   1440,   1 },    // Knightmare	added
+	{ "Mode 13: 2048x1536",       2048,   1536,   1 },
+	{ "Mode 14: 800x480 (wide)",  800,    480,	  1 },    // Knightmare	added
+	{ "Mode 15: 856x480 (wide)",  856,    480,    1 },
+	{ "Mode 16: 1024x600 (wide)", 1024,   600,    1 },    // Knightmare	added
+	{ "Mode 17: 1280x720 (wide)", 1280,   720,    1 },    // Knightmare	added
+	{ "Mode 18: 1280x768 (wide)", 1280,   768,    1 },    // Knightmare	added
+	{ "Mode 19: 1280x800 (wide)", 1280,   800,    1 },    // Knightmare	added
+	{ "Mode 20: 1360x768 (wide)", 1360,   768,	  1 },    // Knightmare	added
+	{ "Mode 21: 1366x768 (wide)", 1366,   768,	  1 },    // Knightmare	added
+	{ "Mode 22: 1440x900 (wide)", 1440,   900,	  1 },    // Knightmare	added
+	{ "Mode 23: 1600x900 (wide)", 1600,   900,    1 },    // Knightmare	added
+	{ "Mode 24: 1600x1024 (wide)", 1600,  1024,   1 },    // Knightmare	added
+	{ "Mode 25: 1680x1050 (wide)", 1680,  1050,   1 },    // Knightmare	added
+	{ "Mode 26: 1920x1080 (wide)", 1920,  1080,   1 },    // Knightmare	added
+	{ "Mode 27: 1920x1200 (wide)", 1920,  1200,   1 },    //----(SA)	added
+	{ "Mode 28: 2560x1080 (ultra-wide)", 2560,  1080,   1 },    // Knightmare	added
+	{ "Mode 29: 2560x1440 (wide)", 2560,  1440,   1 },    // Knightmare	added
+	{ "Mode 30: 2560x1600 (wide)", 2560,  1600,   1 },    // Knightmare	added
+	{ "Mode 31: 3200x1800 (wide)", 3200,  1800,   1 },    // Knightmare	added
+	{ "Mode 32: 3840x2160 (wide)", 3840,  2160,   1 },    // Knightmare	added
+	{ "Mode 33: 3840x2400 (wide)", 3840,  2400,   1 }     // Knightmare	added
 };
 static int s_numVidModes = ( sizeof( r_vidModes ) / sizeof( r_vidModes[0] ) );
 
@@ -814,9 +836,11 @@ void GL_SetDefaultState( void ) {
 
 		qglGetFloatv( GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, &maxAnisotropy );
 		glConfig.maxAnisotropy = maxAnisotropy;
+	//	ri.Cvar_Set( "r_ext_texture_filter_anisotropic_avail", va( "%4.1f", maxAnisotropy ) );	// Knightmare- make this accessible to menus
+		ri.Cvar_Set( "r_ext_texture_filter_anisotropic_avail", va( "%i", (int)maxAnisotropy ) );	// Knightmare- make this accessible to menus
 
 		// set when rendering
-//	   qglTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, glConfig.maxAnisotropy);
+	 //  qglTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, glConfig.maxAnisotropy);
 	}
 
 //----(SA)	end
@@ -974,7 +998,8 @@ void R_Register( void ) {
 
 	r_ati_fsaa_samples              = ri.Cvar_Get( "r_ati_fsaa_samples", "1", CVAR_ARCHIVE );       //DAJ valids are 1, 2, 4
 
-	r_ext_texture_filter_anisotropic    = ri.Cvar_Get( "r_ext_texture_filter_anisotropic", "0", CVAR_ARCHIVE );
+	r_ext_texture_filter_anisotropic    = ri.Cvar_Get( "r_ext_texture_filter_anisotropic", "1.0", CVAR_ARCHIVE );	// Knightmare changed, was 0
+	r_ext_texture_filter_anisotropic_avail = ri.Cvar_Get( "r_ext_texture_filter_anisotropic_avail", "0", CVAR_ROM );	// Knightmare added
 
 	r_ext_NV_fog_dist                   = ri.Cvar_Get( "r_ext_NV_fog_dist", "1", CVAR_ARCHIVE | CVAR_LATCH );
 	r_nv_fogdist_mode                   = ri.Cvar_Get( "r_nv_fogdist_mode", "GL_EYE_RADIAL_NV", CVAR_ARCHIVE );    // default to 'looking good'
@@ -986,8 +1011,8 @@ void R_Register( void ) {
 	r_ext_texture_env_add = ri.Cvar_Get( "r_ext_texture_env_add", "1", CVAR_ARCHIVE | CVAR_LATCH );
 #endif
 
-	r_picmip = ri.Cvar_Get( "r_picmip", "1", CVAR_ARCHIVE | CVAR_LATCH );
-	r_picmip2 = ri.Cvar_Get( "r_picmip2", "2", CVAR_ARCHIVE | CVAR_LATCH );   // used for character skins picmipping at a different level from the rest of the game
+	r_picmip = ri.Cvar_Get( "r_picmip", "0", CVAR_ARCHIVE | CVAR_LATCH );	// Knightmare changed, was 1
+	r_picmip2 = ri.Cvar_Get( "r_picmip2", "1", CVAR_ARCHIVE | CVAR_LATCH );	// Knightmare changed, was 2 // used for character skins picmipping at a different level from the rest of the game
 	r_roundImagesDown = ri.Cvar_Get( "r_roundImagesDown", "1", CVAR_ARCHIVE | CVAR_LATCH );
 	r_lowMemTextureSize = ri.Cvar_Get( "r_lowMemTextureSize", "0", CVAR_ARCHIVE | CVAR_LATCH );
 	r_lowMemTextureThreshold = ri.Cvar_Get( "r_lowMemTextureThreshold", "15.0", CVAR_ARCHIVE | CVAR_LATCH );
@@ -1013,8 +1038,8 @@ void R_Register( void ) {
 	r_stencilbits = ri.Cvar_Get( "r_stencilbits", "8", CVAR_ARCHIVE | CVAR_LATCH );
 #endif
 	r_depthbits = ri.Cvar_Get( "r_depthbits", "0", CVAR_ARCHIVE | CVAR_LATCH );
-	r_overBrightBits = ri.Cvar_Get( "r_overBrightBits", "1", CVAR_ARCHIVE | CVAR_LATCH );
-	r_ignorehwgamma = ri.Cvar_Get( "r_ignorehwgamma", "1", CVAR_ARCHIVE | CVAR_LATCH );    //----(SA) changed this to default to '1' for Drew
+	r_overBrightBits = ri.Cvar_Get( "r_overBrightBits", "0", CVAR_ARCHIVE | CVAR_LATCH );	// Knightmare- disable by default
+	r_ignorehwgamma = ri.Cvar_Get( "r_ignorehwgamma", "0", CVAR_ARCHIVE | CVAR_LATCH );		// Knightmare- HW gamma enabled by default ----(SA) changed this to default to '1' for Drew
 	r_mode = ri.Cvar_Get( "r_mode", "3", CVAR_ARCHIVE | CVAR_LATCH );
 	r_fullscreen = ri.Cvar_Get( "r_fullscreen", "1", CVAR_ARCHIVE | CVAR_LATCH );
 	r_customwidth = ri.Cvar_Get( "r_customwidth", "1600", CVAR_ARCHIVE | CVAR_LATCH );

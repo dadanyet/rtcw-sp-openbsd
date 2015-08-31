@@ -1131,6 +1131,7 @@ extern cvar_t   *r_ati_truform_pointmode;   //----(SA)
 extern cvar_t   *r_ati_truform_normalmode;  //----(SA)
 extern cvar_t   *r_ati_fsaa_samples;        //DAJ
 extern cvar_t   *r_ext_texture_filter_anisotropic;
+extern cvar_t   *r_ext_texture_filter_anisotropic_avail;	// Knightmare added
 extern cvar_t   *r_ext_NV_fog_dist;
 extern cvar_t   *r_nv_fogdist_mode;
 //----(SA)	end
@@ -1258,6 +1259,7 @@ void    GL_Bind( image_t *image );
 void    GL_SetDefaultState( void );
 void    GL_SelectTexture( int unit );
 void    GL_TextureMode( const char *string );
+void	GL_UpdateAnisoMode( void );	// Knightmare added
 void    GL_CheckErrors( void );
 void    GL_State( unsigned long stateVector );
 void    GL_TexEnv( int env );

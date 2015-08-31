@@ -29,6 +29,7 @@ If you have questions concerning this license or the applicable additional terms
 // q_parse.c -- support for parsing text files
 
 #include "q_splineshared.h"
+#include "util_str.h"
 
 /*
 ============================================================================

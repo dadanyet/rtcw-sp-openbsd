@@ -410,7 +410,9 @@ UI_AdjustFrom640
 Adjusted for resolution and screen aspect ratio
 ================
 */
-void UI_AdjustFrom640( float *x, float *y, float *w, float *h ) {
+void UI_AdjustFrom640( float *x, float *y, float *w, float *h, scralign_t align ) {
+	float	vertscale;					// Knightmare added
+	float	tmp_x, tmp_y, tmp_w, tmp_h;	// Knightmare added
 	// expect valid pointers
 #if 0
 	*x = *x * uiInfo.uiDC.scale + uiInfo.uiDC.bias;
@@ -419,22 +421,210 @@ void UI_AdjustFrom640( float *x, float *y, float *w, float *h ) {
 	*h *= uiInfo.uiDC.scale;
 #endif
 
+	// hack for 4:3 modes
+	if ( !(uiInfo.uiDC.xscale > uiInfo.uiDC.yscale) && align != ALIGN_LETTERBOX)
+		align = ALIGN_STRETCH;
+
+	// scale for screen sizes
+	// Knightmare- added anamorphic code
+	switch (align)
+	{
+	case ALIGN_CENTER:
+		if (x) {
+			tmp_x = *x;
+			*x = (tmp_x - (0.5 * SCREEN_WIDTH)) * uiInfo.uiDC.avgscale + (0.5 * uiInfo.uiDC.glconfig.vidWidth);
+		}
+		if (y) {
+			tmp_y = *y;
+			*y = (tmp_y - (0.5 * SCREEN_HEIGHT)) * uiInfo.uiDC.avgscale + (0.5 * uiInfo.uiDC.glconfig.vidHeight);
+		}
+		if (w) 
+			*w *= uiInfo.uiDC.avgscale;
+		if (h)
+			*h *= uiInfo.uiDC.avgscale;
+		break;
+	case ALIGN_LETTERBOX:
+		// special case: video mode (eyefinity?) is wider than object
+		if ( w != NULL && h != NULL && ((float)uiInfo.uiDC.glconfig.vidWidth / (float)uiInfo.uiDC.glconfig.vidHeight > *w / *h) ) {
+			tmp_h = *h;
+			vertscale = uiInfo.uiDC.glconfig.vidHeight / tmp_h;
+			if (x != NULL && w != NULL) {
+				tmp_x = *x;
+				tmp_w = *w;
+				*x = tmp_x * uiInfo.uiDC.xscale - (0.5 * (tmp_w * vertscale - tmp_w * uiInfo.uiDC.xscale));
+			}
+			if (y)
+				*y = 0;
+			if (w) 
+				*w *= vertscale;
+			if (h)
+				*h *= vertscale;
+		}
+		else {
+			if (x)
+				*x *= uiInfo.uiDC.xscale;
+			if (y != NULL && h != NULL) {
+				tmp_y = *y;
+				tmp_h = *h;
+				*y = tmp_y * uiInfo.uiDC.yscale - (0.5 * (tmp_h * uiInfo.uiDC.xscale - tmp_h * uiInfo.uiDC.yscale));
+			}
+			if (w) 
+				*w *= uiInfo.uiDC.xscale;
+			if (h)
+				*h *= uiInfo.uiDC.xscale;
+		}
+		break;
+	case ALIGN_TOP:
+		if (w) 
+			*w *= uiInfo.uiDC.avgscale;
+		if (h)
+			*h *= uiInfo.uiDC.avgscale;
+		if (x) {
+			tmp_x = *x;
+			*x = (tmp_x - (0.5 * SCREEN_WIDTH)) * uiInfo.uiDC.avgscale + (0.5 * uiInfo.uiDC.glconfig.vidWidth);
+		}
+		if (y)
+			*y *= uiInfo.uiDC.avgscale;
+		break;
+	case ALIGN_BOTTOM:
+		if (w) 
+			*w *= uiInfo.uiDC.avgscale;
+		if (h)
+			*h *= uiInfo.uiDC.avgscale;
+		if (x) {
+			tmp_x = *x;
+			*x = (tmp_x - (0.5 * SCREEN_WIDTH)) * uiInfo.uiDC.avgscale + (0.5 * uiInfo.uiDC.glconfig.vidWidth);
+		}
+		if (y) {
+			tmp_y = *y;
+			*y = (tmp_y - SCREEN_HEIGHT) * uiInfo.uiDC.avgscale + uiInfo.uiDC.glconfig.vidHeight;
+		}
+		break;
+	case ALIGN_RIGHT:
+		if (w) 
+			*w *= uiInfo.uiDC.avgscale;
+		if (h)
+			*h *= uiInfo.uiDC.avgscale;
+		if (x) {
+			tmp_x = *x;
+			*x = (tmp_x - SCREEN_WIDTH) * uiInfo.uiDC.avgscale + uiInfo.uiDC.glconfig.vidWidth;
+		}
+		if (y) {
+			tmp_y = *y;
+			*y = (tmp_y - (0.5 * SCREEN_HEIGHT)) * uiInfo.uiDC.avgscale + (0.5 * uiInfo.uiDC.glconfig.vidHeight);
+		}
+		break;
+	case ALIGN_LEFT:
+		if (w) 
+			*w *= uiInfo.uiDC.avgscale;
+		if (h)
+			*h *= uiInfo.uiDC.avgscale;
+		if (x)
+			*x *= uiInfo.uiDC.avgscale;
+		if (y) {
+			tmp_y = *y;
+			*y = (tmp_y - (0.5 * SCREEN_HEIGHT)) * uiInfo.uiDC.avgscale + (0.5 * uiInfo.uiDC.glconfig.vidHeight);
+		}
+		break;
+	case ALIGN_TOPRIGHT:
+		if (w) 
+			*w *= uiInfo.uiDC.avgscale;
+		if (h)
+			*h *= uiInfo.uiDC.avgscale;
+		if (x) {
+			tmp_x = *x;
+			*x = (tmp_x - SCREEN_WIDTH) * uiInfo.uiDC.avgscale + uiInfo.uiDC.glconfig.vidWidth;
+		}
+		if (y)
+			*y *= uiInfo.uiDC.avgscale;
+		break;
+	case ALIGN_TOPLEFT:
+		if (w) 
+			*w *= uiInfo.uiDC.avgscale;
+		if (h)
+			*h *= uiInfo.uiDC.avgscale;
+		if (x)
+			*x *= uiInfo.uiDC.avgscale;
+		if (y)
+			*y *= uiInfo.uiDC.avgscale;
+		break;
+	case ALIGN_BOTTOMRIGHT:
+		if (w) 
+			*w *= uiInfo.uiDC.avgscale;
+		if (h)
+			*h *= uiInfo.uiDC.avgscale;
+		if (x) {
+			tmp_x = *x;
+			*x = (tmp_x - SCREEN_WIDTH) * uiInfo.uiDC.avgscale + uiInfo.uiDC.glconfig.vidWidth;
+		}
+		if (y) {
+			tmp_y = *y;
+			*y = (tmp_y - SCREEN_HEIGHT) * uiInfo.uiDC.avgscale + uiInfo.uiDC.glconfig.vidHeight;
+		}
+		break;
+	case ALIGN_BOTTOMLEFT:
+		if (w) 
+			*w *= uiInfo.uiDC.avgscale;
+		if (h)
+			*h *= uiInfo.uiDC.avgscale;
+		if (x)
+			*x *= uiInfo.uiDC.avgscale;
+		if (y) {
+			tmp_y = *y;
+			*y = (tmp_y - SCREEN_HEIGHT) * uiInfo.uiDC.avgscale + uiInfo.uiDC.glconfig.vidHeight;
+		}
+		break;
+	case ALIGN_TOP_STRETCH:
+		if (w) 
+			*w *= uiInfo.uiDC.xscale;
+		if (h)
+			*h *= uiInfo.uiDC.avgscale;
+		if (x)
+			*x *= uiInfo.uiDC.xscale;
+		if (y)
+			*y *= uiInfo.uiDC.avgscale;
+		break;
+	case ALIGN_BOTTOM_STRETCH:
+		if (w) 
+			*w *= uiInfo.uiDC.xscale;
+		if (h)
+			*h *= uiInfo.uiDC.avgscale;
+		if (x)
+			*x *= uiInfo.uiDC.xscale;
+		if (y) {
+			tmp_y = *y;
+			*y = (tmp_y - SCREEN_HEIGHT) * uiInfo.uiDC.avgscale + uiInfo.uiDC.glconfig.vidHeight;
+		}
+		break;
+	case ALIGN_STRETCH:
+	default:
+		if (x)
+			*x *= uiInfo.uiDC.xscale;
+		if (y) 
+			*y *= uiInfo.uiDC.yscale;
+		if (w) 
+			*w *= uiInfo.uiDC.xscale;
+		if (h)
+			*h *= uiInfo.uiDC.yscale;
+		break;
+	}
+/*
 	*x *= uiInfo.uiDC.xscale;
 	*y *= uiInfo.uiDC.yscale;
 	*w *= uiInfo.uiDC.xscale;
 	*h *= uiInfo.uiDC.yscale;
-
+*/
 }
 
-void UI_DrawNamedPic( float x, float y, float width, float height, const char *picname ) {
+void UI_DrawNamedPic( float x, float y, float width, float height, const char *picname, scralign_t align ) {
 	qhandle_t hShader;
 
 	hShader = trap_R_RegisterShaderNoMip( picname );
-	UI_AdjustFrom640( &x, &y, &width, &height );
+	UI_AdjustFrom640( &x, &y, &width, &height, align );
 	trap_R_DrawStretchPic( x, y, width, height, 0, 0, 1, 1, hShader );
 }
 
-void UI_DrawHandlePic( float x, float y, float w, float h, qhandle_t hShader ) {
+void UI_DrawHandlePic( float x, float y, float w, float h, qhandle_t hShader, scralign_t align ) {
 	float s0;
 	float s1;
 	float t0;
@@ -458,7 +648,7 @@ void UI_DrawHandlePic( float x, float y, float w, float h, qhandle_t hShader ) {
 		t1 = 1;
 	}
 
-	UI_AdjustFrom640( &x, &y, &w, &h );
+	UI_AdjustFrom640( &x, &y, &w, &h, align );
 	trap_R_DrawStretchPic( x, y, w, h, s0, t0, s1, t1, hShader );
 }
 
@@ -469,23 +659,23 @@ UI_FillRect
 Coordinates are 640*480 virtual values
 =================
 */
-void UI_FillRect( float x, float y, float width, float height, const float *color ) {
+void UI_FillRect( float x, float y, float width, float height, const float *color, scralign_t align ) {
 	trap_R_SetColor( color );
 
-	UI_AdjustFrom640( &x, &y, &width, &height );
+	UI_AdjustFrom640( &x, &y, &width, &height, align );
 	trap_R_DrawStretchPic( x, y, width, height, 0, 0, 0, 0, uiInfo.uiDC.whiteShader );
 
 	trap_R_SetColor( NULL );
 }
 
-void UI_DrawSides( float x, float y, float w, float h ) {
-	UI_AdjustFrom640( &x, &y, &w, &h );
+void UI_DrawSides( float x, float y, float w, float h, scralign_t align ) {
+	UI_AdjustFrom640( &x, &y, &w, &h, align );
 	trap_R_DrawStretchPic( x, y, 1, h, 0, 0, 0, 0, uiInfo.uiDC.whiteShader );
 	trap_R_DrawStretchPic( x + w - 1, y, 1, h, 0, 0, 0, 0, uiInfo.uiDC.whiteShader );
 }
 
-void UI_DrawTopBottom( float x, float y, float w, float h ) {
-	UI_AdjustFrom640( &x, &y, &w, &h );
+void UI_DrawTopBottom( float x, float y, float w, float h, scralign_t align ) {
+	UI_AdjustFrom640( &x, &y, &w, &h,align );
 	trap_R_DrawStretchPic( x, y, w, 1, 0, 0, 0, 0, uiInfo.uiDC.whiteShader );
 	trap_R_DrawStretchPic( x, y + h - 1, w, 1, 0, 0, 0, 0, uiInfo.uiDC.whiteShader );
 }
@@ -496,11 +686,11 @@ UI_DrawRect
 Coordinates are 640*480 virtual values
 =================
 */
-void UI_DrawRect( float x, float y, float width, float height, const float *color ) {
+void UI_DrawRect( float x, float y, float width, float height, const float *color, scralign_t align ) {
 	trap_R_SetColor( color );
 
-	UI_DrawTopBottom( x, y, width, height );
-	UI_DrawSides( x, y, width, height );
+	UI_DrawTopBottom( x, y, width, height, align );
+	UI_DrawSides( x, y, width, height, align );
 
 	trap_R_SetColor( NULL );
 }
@@ -514,9 +704,9 @@ void UI_UpdateScreen( void ) {
 }
 
 
-void UI_DrawTextBox( int x, int y, int width, int lines ) {
-	UI_FillRect( x + BIGCHAR_WIDTH / 2, y + BIGCHAR_HEIGHT / 2, ( width + 1 ) * BIGCHAR_WIDTH, ( lines + 1 ) * BIGCHAR_HEIGHT, colorBlack );
-	UI_DrawRect( x + BIGCHAR_WIDTH / 2, y + BIGCHAR_HEIGHT / 2, ( width + 1 ) * BIGCHAR_WIDTH, ( lines + 1 ) * BIGCHAR_HEIGHT, colorWhite );
+void UI_DrawTextBox( int x, int y, int width, int lines, scralign_t align ) {
+	UI_FillRect( x + BIGCHAR_WIDTH / 2, y + BIGCHAR_HEIGHT / 2, ( width + 1 ) * BIGCHAR_WIDTH, ( lines + 1 ) * BIGCHAR_HEIGHT, colorBlack, align );
+	UI_DrawRect( x + BIGCHAR_WIDTH / 2, y + BIGCHAR_HEIGHT / 2, ( width + 1 ) * BIGCHAR_WIDTH, ( lines + 1 ) * BIGCHAR_HEIGHT, colorWhite, align );
 }
 
 qboolean UI_CursorInRect( int x, int y, int width, int height ) {
@@ -526,6 +716,5 @@ qboolean UI_CursorInRect( int x, int y, int width, int height ) {
 		 uiInfo.uiDC.cursory > y + height ) {
 		return qfalse;
 	}
-
 	return qtrue;
 }

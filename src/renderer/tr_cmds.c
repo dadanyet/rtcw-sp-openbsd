@@ -393,6 +393,17 @@ void RE_BeginFrame( stereoFrame_t stereoFrame ) {
 		R_SyncRenderThread();
 		GL_TextureMode( r_textureMode->string );
 		r_textureMode->modified = qfalse;
+		// Knightmare- we've already set anisotropy, so don't bother setting it again this frame
+		r_ext_texture_filter_anisotropic->modified = qfalse;
+	}
+
+	//
+	// Knightmare- anisotropic stuff
+	//
+	if ( r_ext_texture_filter_anisotropic->modified ) {
+		R_SyncRenderThread();
+		GL_UpdateAnisoMode( );
+		r_ext_texture_filter_anisotropic->modified = qfalse;
 	}
 
 	//

@@ -28,6 +28,7 @@ If you have questions concerning this license or the applicable additional terms
 
 // q_shared.c -- stateless support routines that are included in each code dll
 #include "q_splineshared.h"
+#include "util_str.h"
 
 /*
 ============================================================================
