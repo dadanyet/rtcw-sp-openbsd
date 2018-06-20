@@ -999,7 +999,7 @@ EVENT LOOP
 */
 
 // bk000306: upped this from 64
-#define MAX_QUED_EVENTS     256
+#define MAX_QUED_EVENTS     512
 #define MASK_QUED_EVENTS    ( MAX_QUED_EVENTS - 1 )
 
 sysEvent_t eventQue[MAX_QUED_EVENTS];

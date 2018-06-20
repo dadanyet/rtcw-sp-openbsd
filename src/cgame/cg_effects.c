@@ -433,8 +433,10 @@ void CG_LaunchGib( centity_t *cent, vec3_t origin, vec3_t angles, vec3_t velocit
 	le->leType = LE_FRAGMENT;
 	le->startTime = cg.time;
 	// le->endTime = le->startTime + 60000 + random() * 60000;
-	// le->endTime = le->startTime + 20000 + ( crandom() * 5000 );
-	le->endTime = le->startTime + 999000;   // stay around for long enough to see the player off
+	if ( cent && CG_EntOnFire( cent ) )
+		le->endTime = le->startTime + 20000 + ( crandom() * 5000 );
+	else
+		le->endTime = le->startTime + 999000;   // stay around for long enough to see the player off
 
 	le->breakCount = breakCount;
 	le->sizeScale = sizeScale;
