@@ -1,5 +1,26 @@
 /*
 ===========================================================================
+Copyright (C) 1999-2005 Id Software, Inc.
+
+This file is part of Quake III Arena source code.
+
+Quake III Arena source code is free software; you can redistribute it
+and/or modify it under the terms of the GNU General Public License as
+published by the Free Software Foundation; either version 2 of the License,
+or (at your option) any later version.
+
+Quake III Arena source code is distributed in the hope that it will be
+useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with Foobar; if not, write to the Free Software
+Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+===========================================================================
+*/
+/*
+===========================================================================
 
 Return to Castle Wolfenstein single player GPL Source Code
 Copyright (C) 1999-2010 id Software LLC, a ZeniMax Media company. 
@@ -924,15 +945,17 @@ static void SV_InitGameVM( qboolean restart ) {
 	// start the entity parsing at the beginning
 	sv.entityParsePoint = CM_EntityString();
 
-	// use the current msec count for a random seed
-	// init for this gamestate
-	VM_Call( gvm, GAME_INIT, svs.time, Com_Milliseconds(), restart );
-
 	// clear all gentity pointers that might still be set from
 	// a previous level
+	// https://zerowing.idsoftware.com/bugzilla/show_bug.cgi?id=522
+	//   now done before GAME_INIT call
 	for ( i = 0 ; i < sv_maxclients->integer ; i++ ) {
 		svs.clients[i].gentity = NULL;
 	}
+
+	// use the current msec count for a random seed
+	// init for this gamestate
+	VM_Call( gvm, GAME_INIT, svs.time, Com_Milliseconds(), restart );
 }
 
 
